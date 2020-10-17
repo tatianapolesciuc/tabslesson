@@ -63,7 +63,7 @@ info.addEventListener('click', function(event) {
 
                 function addZero(num){
                     if(num <= 9) {
-                        return '0' + num;
+                        return `0 ${num}`;
                     } else return num;
                 };
 
@@ -102,29 +102,71 @@ info.addEventListener('click', function(event) {
 
     //modal in tabs
 
-    let descriptionBtn = document.querySelectorAll('.description-btn'),
-        infoClass = document.querySelector('.info');
+    // let descriptionBtn = document.querySelectorAll('.description-btn'),
+    //     infoClass = document.querySelector('.info');
 
-    infoClass.addEventListener('click', function(event) {
-        let target = event.target;
-        if(target && target.classList.contains('description-btn')) {
-            for(let i = 0; i < descriptionBtn.length; i++) {
-                if(target == descriptionBtn[i]) {
-                    overlay.style.display = 'block';
-                    descriptionBtn.classList.add('more-splash');
-                    document.body.style.overflow = 'hidden';
-                    break;
-                }
+    // infoClass.addEventListener('click', function(event) {
+    //     let target = event.target;
+    //     if(target && target.classList.contains('description-btn')) {
+    //         for(let i = 0; i < descriptionBtn.length; i++) {
+    //             if(target == descriptionBtn[i]) {
+    //                 overlay.style.display = 'block';
+    //                 descriptionBtn.classList.add('more-splash');
+    //                 document.body.style.overflow = 'hidden';
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // });
+
+
+    //Form
+
+    let message = {
+        loading: 'Загрузка...',
+        success: 'Спасибо. Скоро мы с вами свяжемся...',
+        failure: 'Что-то пошло не так...'
+    };
+
+    let form = document.querySelector('.main-form'),
+        input = document.getElementsByTagName('input'),
+        statusMessage = document.createElement('div');
+
+        statusMessage.classList.add('status');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        form.appendChild(statusMessage);
+
+        let request = new XMLHttpRequest();
+        request.open('POST', 'server.php');
+        request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+        let formData = new FormData(form);
+
+        let obj = {};
+        formData.forEach(function(value, key) {
+            obj[key] = value;
+        }); 
+        let json = JSON.stringify(obj);
+        request.send(json);
+
+        request.addEventListener('readystatechange', function() {
+            if(request.readyState < 4) {
+                statusMessage.innerHTML = message.loading;
+            } else if(request.readyState === 4 && request.status == 200) {
+                statusMessage.innerHTML = message.success;
+            } else {
+                statusMessage.innerHTML = message.failure;
             }
+        });
+        
+        for (let i = 0; i < input.length; i++) {
+                    input[i].value = '';
         }
+
     });
 
     
-// let age = document.getElementById('age');
-// function showUser(surname, name) {
-// alert("Пользователь " + surname + " " + name + ", его возраст " + this.value);
-// }
-// showUser.apply(age, ["Горький","Максим"]);
-
 });
 
